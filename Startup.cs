@@ -23,6 +23,15 @@ namespace SampleSignalRServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(CorsOptions=>{
+               CorsOptions.AddPolicy("SignalRClient",policy => {
+                   policy
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowAnyOrigin();
+               });
+            });
+            services.AddSignalR();
             services.AddMvc();
         }
 
@@ -33,7 +42,11 @@ namespace SampleSignalRServer
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors("SignalRClient");
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<Chat>("/chat");
+            });
             app.UseMvc();
         }
     }
